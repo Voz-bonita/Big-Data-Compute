@@ -1,4 +1,3 @@
-from xml.etree.ElementTree import fromstring
 import requests
 from lxml import html
 import os
@@ -19,9 +18,7 @@ for link in links:
     info = link.text.split()
     uf = info[1]
     parte = "_".join(info[3:])
-
+    print(uf)
     download = requests.get(link.attrib["href"])
     with open(f"{SAVE_DIR}{uf}-{parte}.csv", "wb+") as file:
         file.write(download.content)
-
-    break

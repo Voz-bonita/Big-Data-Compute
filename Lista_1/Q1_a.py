@@ -11,6 +11,7 @@ xpath = '//*[@id="content"]/div[3]/section/div/div[2]/ul/li'
 links = doc.xpath(xpath)[0].findall(".//a")
 
 SAVE_DIR = "./Lista_1/dados/"
+# Se a pasta não existir, então deve ser criada
 if not os.path.exists(SAVE_DIR):
     os.mkdir(SAVE_DIR)
 

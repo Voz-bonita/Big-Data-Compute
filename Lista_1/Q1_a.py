@@ -19,6 +19,7 @@ for link in links:
     uf = info[1]
     parte = "_".join(info[3:])
     print(uf)
-    download = requests.get(link.attrib["href"])
+    download = requests.get(link.attrib["href"], stream=True)
     with open(f"{SAVE_DIR}{uf}-{parte}.csv", "wb+") as file:
-        file.write(download.content)
+        for chunk in download.iter_content(chunk_size=5 * 1024):
+            file.write(chunk)

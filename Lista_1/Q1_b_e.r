@@ -20,11 +20,12 @@ head(primeiro[3:6L]) %>%
 spec(primeiro)
 
 ## Item c)
-pacman::p_load("purrr")
 arquivos <- paste0(
     dados_path,
     list.files(dados_path)
 )
+
 length(arquivos)
-map_dbl(arquivos, ~ file.info(.x)[["size"]]) %>%
-    sum() / 10^6
+bytes <- file.size(arquivos) %>% sum()
+bytes / 1024^2 # Megabytes
+bytes / 1024^3 # Gigabytes

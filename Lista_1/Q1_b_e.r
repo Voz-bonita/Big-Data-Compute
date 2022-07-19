@@ -18,3 +18,13 @@ head(primeiro[3:6L]) %>%
     kable()
 
 spec(primeiro)
+
+## Item c)
+pacman::p_load("purrr")
+arquivos <- paste0(
+    dados_path,
+    list.files(dados_path)
+)
+length(arquivos)
+map_dbl(arquivos, ~ file.info(.x)[["size"]]) %>%
+    sum() / 10^6

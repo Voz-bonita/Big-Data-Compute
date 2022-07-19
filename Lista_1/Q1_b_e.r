@@ -1,7 +1,10 @@
 pacman::p_load("vroom", "knitr", "dplyr")
 
 
-primeiro <- vroom("./Lista_1/dados/AC-Parte_1.csv",
+# Questão 1
+## Item b)
+dados_path <- "./Lista_1/dados/"
+primeiro <- vroom(paste0(dados_path, "AC-Parte_1.csv"),
     delim = ";",
     num_threads = 4,
     locale = locale(

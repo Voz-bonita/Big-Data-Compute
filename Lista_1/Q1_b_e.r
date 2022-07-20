@@ -1,10 +1,10 @@
-pacman::p_load("vroom", "knitr", "dplyr")
+pacman::p_load("vroom", "knitr", "dplyr", "glue")
 
 
 # Questão 1
 ## Item b)
-dados_path <- "./Lista_1/dados/"
-arquivo1 <- paste0(dados_path, "AC-Parte_1.csv")
+dados_path <- "./Lista_1/dados"
+arquivo1 <- glue("{dados_path}/AC-Parte_1.csv")
 primeiro <- vroom(arquivo1,
     delim = ";",
     num_threads = 4,
@@ -21,10 +21,7 @@ head(primeiro[3:6L]) %>%
 spec(primeiro)
 
 ## Item c)
-arquivos <- paste0(
-    dados_path,
-    list.files(dados_path)
-)
+arquivos <- glue("{dados_path}/{list.files(dados_path)}")
 
 length(arquivos)
 bytes <- file.size(arquivos) %>% sum()
@@ -36,7 +33,7 @@ unique(primeiro$vacina_nome)
 ### ASTRAZENECA e ASTRAZENECA/FIOCRUZ
 
 astrazeneca <- vroom(
-    pipe(paste0("grep -i ASTRAZENECA ", arquivo1)),
+    pipe(glue("grep -i ASTRAZENECA {arquivo1}")),
     delim = ";",
     num_threads = 4,
     locale = locale(

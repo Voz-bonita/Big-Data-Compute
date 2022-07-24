@@ -35,9 +35,6 @@ astrazeneca <- vroom(
     col_names = names(primeiro)
 )
 
-# object.size(primeiro)
-# object.size(astrazeneca)
-
 pacman::p_load("pryr", "microbenchmark")
 object_size(astrazeneca) # [1] 17.55 kB
 object_size(primeiro) # [1] 17.55 kB

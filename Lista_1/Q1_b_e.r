@@ -8,11 +8,6 @@ arquivo1 <- glue("{dados_path}/AC-Parte_1.csv")
 primeiro <- vroom(arquivo1,
     delim = ";",
     num_threads = 4,
-    locale = locale(
-        grouping_mark = ".",
-        decimal_mark = ",",
-        encoding = "UTF-8"
-    ),
     show_col_types = FALSE
 )
 head(primeiro[3:6L]) %>%
@@ -36,11 +31,6 @@ astrazeneca <- vroom(
     pipe(glue("grep -i ASTRAZENECA {arquivo1}")),
     delim = ";",
     num_threads = 4,
-    locale = locale(
-        grouping_mark = ".",
-        decimal_mark = ",",
-        encoding = "UTF-8"
-    ),
     show_col_types = FALSE,
     col_names = names(primeiro)
 )
@@ -65,3 +55,9 @@ microbenchmark(
 RAM_primeiro <- object.size(primeiro) / 1024^2 #> 233,8 Megabytes
 RAM_astrazeneca <- object.size(astrazeneca) / 1024^2 #> 80,1 Megabytes
 RAM_primeiro - RAM_astrazeneca #> 153,7 Megabytes
+
+## Item e)
+todos <- vroom(arquivos,
+    delim = ";",
+    num_threads = 7
+)

@@ -15,11 +15,15 @@ SAVE_DIR = "./Lista_1/dados/"
 if not os.path.exists(SAVE_DIR):
     os.mkdir(SAVE_DIR)
 
+uf_valida = ["AC", "AL", "AM"]
 for link in links:
     info = link.text.split()
     uf = info[1]
+    if uf not in uf_valida:
+        continue
+
     parte = "_".join(info[3:])
-    print(uf)
+    print(f"{uf} {parte}")
     download = requests.get(link.attrib["href"], stream=True)
     with open(f"{SAVE_DIR}{uf}-{parte}.csv", "wb+") as file:
         for chunk in download.iter_content(chunk_size=5 * 1024):

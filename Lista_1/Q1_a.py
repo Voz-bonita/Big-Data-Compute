@@ -15,7 +15,7 @@ SAVE_DIR = "./Lista_1/dados/"
 if not os.path.exists(SAVE_DIR):
     os.mkdir(SAVE_DIR)
 
-uf_valida = ["AC", "AL", "AM"]
+uf_valida = ["AC", "AL", "AM", "AP"]
 for link in links:
     info = link.text.split()
     uf = info[1]

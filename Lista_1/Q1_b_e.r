@@ -20,8 +20,11 @@ arquivos <- glue("{dados_path}/{list.files(dados_path)}")
 
 length(arquivos)
 bytes <- file.size(arquivos) %>% sum()
-bytes / 1024^2 # Megabytes
-bytes / 1024^3 # Gigabytes
+bytes / 1024^2 #> 7588,352 Megabytes
+bytes / 1024^3 #> 7,4105 Gigabytes
+
+object.size(primeiro) / 1024^2 #> 233,8 Megabytes
+file.size(arquivo1) / 1024^2 #> 244,8 Megabytes
 
 ## Item d)
 unique(primeiro$vacina_nome)

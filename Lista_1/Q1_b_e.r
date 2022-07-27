@@ -1,4 +1,4 @@
-pacman::p_load("vroom", "knitr", "dplyr", "glue", "tidyr")
+pacman::p_load("vroom", "knitr", "dplyr", "glue", "tidyr", "kableExtra")
 
 
 # Questão 1
@@ -14,7 +14,15 @@ ncol(primeiro) #> 32 colunas
 nrow(primeiro) #> 499890 linhas
 
 head(primeiro[3:6L]) %>%
-    kable()
+    kable(
+        caption = "\\label{tab:1b}5 primeiras observações da primeira parte dos dados de vacinação do estado do Acre.",
+        booktabs = T,
+        "latex"
+    ) %>%
+    kable_styling(
+        latex_options = c("striped", "hold_position"),
+        full_width = F
+    )
 
 spec(primeiro)
 
@@ -49,7 +57,14 @@ nrow(janssen) #> 13222 linhas
 ### O banco "janssen" conta com uma redução de 486668 linhas em relação ao "primeiro"
 
 head(janssen[3:6L]) %>%
-    kable()
+    kable(
+        caption = "\\label{tab:1b}5 primeiras observações da primeira parte dos dados de vacinação do estado do Acre.",
+        booktabs = T,
+    ) %>%
+    kable_styling(
+        latex_options = c("striped", "hold_position"),
+        full_width = F
+    )
 
 pacman::p_load("pryr", "microbenchmark")
 object_size(janssen) # [1] 17.55 kB
@@ -63,7 +78,15 @@ microbenchmark(
     summary() %>%
     select(-`lq`, -uq, -median, -neval) %>%
     rename_all(~ c("Pacote", "Mínimo", "Média", "Máximo")) %>%
-    kable(digits = 4)
+    kable(
+        digits = 4,
+        caption = "\\label{tab:1b}5 primeiras observações da primeira parte dos dados de vacinação do estado do Acre.",
+        booktabs = T,
+    ) %>%
+    kable_styling(
+        latex_options = c("striped", "hold_position"),
+        full_width = F
+    )
 
 RAM_primeiro <- object.size(primeiro) / 1024^2 #> 233,8 Megabytes
 RAM_janssen <- object.size(janssen) / 1024^2 #> 6,6 Megabytes

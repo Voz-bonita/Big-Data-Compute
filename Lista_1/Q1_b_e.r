@@ -23,28 +23,32 @@ bytes <- file.size(arquivos) %>% sum()
 bytes / 1024^2 #> 7588,352 Megabytes
 bytes / 1024^3 #> 7,4105 Gigabytes
 
-object.size(primeiro) / 1024^2 #> 233,8 Megabytes
-file.size(arquivo1) / 1024^2 #> 244,8 Megabytes
+#| object.size(primeiro) / 1024^2 #> 233,8 Megabytes
+#| file.size(arquivo1) / 1024^2 #> 244,8 Megabytes
 
 ## Item d)
 unique(primeiro$vacina_nome)
-### ASTRAZENECA e ASTRAZENECA/FIOCRUZ
 
-astrazeneca <- vroom(
-    pipe(glue("grep -i ASTRAZENECA {arquivo1}")),
+janssen <- vroom(
+    pipe(glue("grep -i JANSSEN {arquivo1}")),
     delim = ";",
     num_threads = 4,
     show_col_types = FALSE,
     col_names = names(primeiro)
 )
 
+### Confirmando que as únicas observações importadas são aquelas
+### cuja vacina aplicada foi a Janssen.
+unique(janssen$vacina_nome)
+
+
 pacman::p_load("pryr", "microbenchmark")
-object_size(astrazeneca) # [1] 17.55 kB
+object_size(janssen) # [1] 17.55 kB
 object_size(primeiro) # [1] 17.55 kB
 
 microbenchmark(
-    "pryr" = pryr::object_size(astrazeneca),
-    "utils" = utils::object.size(astrazeneca),
+    "pryr" = pryr::object_size(primeiro),
+    "utils" = utils::object.size(primeiro),
     times = 3L, unit = "s"
 ) %>%
     summary() %>%
@@ -53,8 +57,8 @@ microbenchmark(
     kable(digits = 4)
 
 RAM_primeiro <- object.size(primeiro) / 1024^2 #> 233,8 Megabytes
-RAM_astrazeneca <- object.size(astrazeneca) / 1024^2 #> 80,1 Megabytes
-RAM_primeiro - RAM_astrazeneca #> 153,7 Megabytes
+RAM_janssen <- object.size(janssen) / 1024^2 #> 6,6 Megabytes
+RAM_primeiro - RAM_janssen #> 227,1 Megabytes
 
 ## Item e)
 todos <- vroom(arquivos,

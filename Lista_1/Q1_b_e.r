@@ -15,9 +15,9 @@ nrow(primeiro) #> 499890 linhas
 
 head(primeiro[3:6L]) %>%
     kable(
-        caption = "\\label{tab:1b}5 primeiras observações da primeira parte dos dados de vacinação do estado do Acre.",
+        caption = "\\label{tab:1b}5 primeiras observações da
+        primeira parte dos dados de vacinação do estado do Acre.",
         booktabs = T,
-        "latex"
     ) %>%
     kable_styling(
         latex_options = c("striped", "hold_position"),
@@ -58,7 +58,9 @@ nrow(janssen) #> 13222 linhas
 
 head(janssen[3:6L]) %>%
     kable(
-        caption = "\\label{tab:1d1}5 primeiras observações da primeira parte dos dados de vacinação do estado do Acre, cuja vacina aplicada foi a Janssen.",
+        caption = "\\label{tab:1d1}5 primeiras observações da primeira
+        parte dos dados de vacinação do estado do Acre,
+        cuja vacina aplicada foi a Janssen.",
         booktabs = T,
     ) %>%
     kable_styling(
@@ -80,7 +82,8 @@ microbenchmark(
     rename_all(~ c("Pacote", "Mínimo", "Média", "Máximo")) %>%
     kable(
         digits = 4,
-        caption = "\\label{tab:1d1}Benchmark do tempo de execução das funções object_size e object.size sobre o banco AC-Parte_1.",
+        caption = "\\label{tab:1d1}Benchmark do tempo de execução das funções
+        object_size e object.size sobre o banco AC-Parte_1.",
         booktabs = T,
     ) %>%
     kable_styling(

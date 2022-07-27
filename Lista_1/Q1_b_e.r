@@ -10,6 +10,9 @@ primeiro <- vroom(arquivo1,
     num_threads = 4,
     show_col_types = FALSE
 )
+ncol(primeiro) #> 32 colunas
+nrow(primeiro) #> 499890 linhas
+
 head(primeiro[3:6L]) %>%
     kable()
 
@@ -41,6 +44,12 @@ janssen <- vroom(
 ### cuja vacina aplicada foi a Janssen.
 unique(janssen$vacina_nome)
 
+ncol(janssen) #> 32 colunas
+nrow(janssen) #> 13222 linhas
+### O banco "janssen" conta com uma redução de 486668 linhas em relação ao "primeiro"
+
+head(janssen[3:6L]) %>%
+    kable()
 
 pacman::p_load("pryr", "microbenchmark")
 object_size(janssen) # [1] 17.55 kB

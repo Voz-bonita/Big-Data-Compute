@@ -70,7 +70,13 @@ RAM_janssen <- object.size(janssen) / 1024^2 #> 6,6 Megabytes
 RAM_primeiro - RAM_janssen #> 227,1 Megabytes
 
 ## Item e)
-todos <- vroom(arquivos,
+todos <- vroom(
+    pipe(glue("grep -i JANSSEN {dados_path}/*.csv")),
     delim = ";",
-    num_threads = 7
+    num_threads = 4,
+    show_col_types = FALSE,
+    col_names = names(primeiro)
 )
+
+ncol(todos) #> 32 colunas
+nrow(todos) #> 316265 > linhas

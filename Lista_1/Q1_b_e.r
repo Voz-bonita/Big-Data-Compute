@@ -83,7 +83,7 @@ microbenchmark(
     kable(
         digits = 4,
         caption = "\\label{tab:1d1}Benchmark do tempo de execução das funções
-        object_size e object.size sobre o banco AC-Parte_1.",
+        object\\_size e object.size sobre o banco AC-Parte\\_1.",
         booktabs = T,
     ) %>%
     kable_styling(

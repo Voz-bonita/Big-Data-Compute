@@ -106,3 +106,6 @@ todos <- vroom(
 
 ncol(todos) #> 32 colunas
 nrow(todos) #> 316265 > linhas
+
+### Preparação para a questão 2
+sort(unique(todos$vacina_descricao_dose))

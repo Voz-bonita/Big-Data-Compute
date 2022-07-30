@@ -27,4 +27,12 @@ seg_dose <- fread(
 ncol(seg_dose) #> 3 colunas
 nrow(seg_dose) #> 5861457 linhas
 
-regioes_saude <- read_health_region()
+regioes_saude <- read_health_region() %>%
+    as.data.table()
+
+## item b)
+joined <- regioes_saude[teste,
+    on = c(code_health_region = "estabelecimento_municipio_codigo")
+]
+
+qnt_vax <- joined[, .N, by = .(code_health_region)]

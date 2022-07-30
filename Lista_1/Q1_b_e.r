@@ -1,5 +1,5 @@
 pacman::p_load("vroom", "knitr", "dplyr", "glue", "tidyr", "kableExtra")
-
+source("./Lista_1/funcoes_aux.r")
 
 # Questão 1
 ## Item b)
@@ -14,14 +14,9 @@ ncol(primeiro) #> 32 colunas
 nrow(primeiro) #> 499890 linhas
 
 head(primeiro[3:6L]) %>%
-    kable(
+    format_tab(
         caption = "\\label{tab:1b}5 primeiras observações da
-        primeira parte dos dados de vacinação do estado do Acre.",
-        booktabs = T,
-    ) %>%
-    kable_styling(
-        latex_options = c("striped", "hold_position"),
-        full_width = F
+        primeira parte dos dados de vacinação do estado do Acre."
     )
 
 spec(primeiro)
@@ -57,15 +52,10 @@ nrow(janssen) #> 13222 linhas
 ### O banco "janssen" conta com uma redução de 486668 linhas em relação ao "primeiro"
 
 head(janssen[3:6L]) %>%
-    kable(
+    format_tab(
         caption = "\\label{tab:1d1}5 primeiras observações da primeira
         parte dos dados de vacinação do estado do Acre,
-        cuja vacina aplicada foi a Janssen.",
-        booktabs = T,
-    ) %>%
-    kable_styling(
-        latex_options = c("striped", "hold_position"),
-        full_width = F
+        cuja vacina aplicada foi a Janssen."
     )
 
 pacman::p_load("pryr", "microbenchmark")
@@ -80,15 +70,10 @@ microbenchmark(
     summary() %>%
     select(-`lq`, -uq, -median, -neval) %>%
     rename_all(~ c("Pacote", "Mínimo", "Média", "Máximo")) %>%
-    kable(
-        digits = 4,
+    format_tab(
         caption = "\\label{tab:1d1}Benchmark do tempo de execução das funções
         object\\_size e object.size sobre o banco AC-Parte\\_1.",
-        booktabs = T,
-    ) %>%
-    kable_styling(
-        latex_options = c("striped", "hold_position"),
-        full_width = F
+        digits = 4
     )
 
 RAM_primeiro <- object.size(primeiro) / 1024^2 #> 233,8 Megabytes

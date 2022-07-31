@@ -48,8 +48,11 @@ regioes_saude <- as.data.table(read_health_region())[
 joined <- regioes_saude[seg_dose,
     on = "code_health_region"
 ]
-
 format_tab(
     joined[1:6L, 1:5L],
     "Junção dos dados de vacinação e regiões de saúde"
 )
+
+qnt_vax <- joined[, .N,
+    by = .(code_health_region)
+][, "faixa_de_vacinacao" := alto_baixo(N - median(N))]

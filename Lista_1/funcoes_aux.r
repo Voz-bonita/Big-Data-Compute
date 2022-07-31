@@ -14,3 +14,13 @@ format_tab <- function(df, caption, ...) {
         )
     return(tabela)
 }
+
+alto_baixo <- function(x) {
+    x <- as.double(c(x))
+
+    cond <- x < 0
+    x[cond] <- "baixo"
+    x[!cond] <- "alto"
+
+    return(x)
+}

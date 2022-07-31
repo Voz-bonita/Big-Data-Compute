@@ -56,3 +56,8 @@ format_tab(
 qnt_vax <- joined[, .N,
     by = .(code_health_region)
 ][, "faixa_de_vacinacao" := alto_baixo(N - median(N))]
+
+bot5_vax <- qnt_vax[, .(
+    vacinados = head(sort(N), 5),
+    codigo_regiao_saude = code_health_region[match(head(sort(N), 5), N)]
+), by = .(faixa_de_vacinacao)]

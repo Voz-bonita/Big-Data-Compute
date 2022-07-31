@@ -38,8 +38,10 @@ seg_dose <- fread(
 ncol(seg_dose) #> 3 colunas
 nrow(seg_dose) #> 5861457 linhas
 
-regioes_saude <- read_health_region() %>%
-    as.data.table()
+regioes_saude <- as.data.table(read_health_region())[
+    ,
+    !c("abbrev_state", "name_state", "code_state", "geom")
+]
 
 
 ## item b)
@@ -48,6 +50,6 @@ joined <- regioes_saude[seg_dose,
 ]
 
 format_tab(
-    joined[1:6L, 1:7L],
+    joined[1:6L, 1:5L],
     "Junção dos dados de vacinação e regiões de saúde"
 )

@@ -50,14 +50,22 @@ joined <- regioes_saude[seg_dose,
 ]
 format_tab(
     joined[1:6L, 1:4L],
-    "Junção dos dados de vacinação e regiões de saúde"
+    "Junção dos dados de vacinação e regiões de saúde."
 )
 
 qnt_vax <- joined[, .N,
-    by = .(code_health_region)
+    by = .(code_health_region, name_health_region)
 ][, "faixa_de_vacinacao" := alto_baixo(N - median(N))]
+format_tab(
+    qnt_vax[1:6L, ],
+    "Quantidade de vacinados por região saúde."
+)
 
 bot5_vax <- qnt_vax[, .(
     vacinados = head(sort(N), 5),
-    codigo_regiao_saude = code_health_region[match(head(sort(N), 5), N)]
+    name_health_region = name_health_region[match(head(sort(N), 5), N)]
 ), by = .(faixa_de_vacinacao)]
+format_tab(
+    qnt_vax[1:10L, ],
+    "5 regiões de saúde com menos vacinados por faixa de vacinação."
+)

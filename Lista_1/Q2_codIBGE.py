@@ -3,7 +3,8 @@ import json
 
 
 def main():
-    IBGE = "https://sage.saude.gov.br/paineis/regiaoSaude/lista.php?output=jsonbt&&order=asc&_=1659303484372"
+    XHR_header = "lista.php?output=jsonbt&&order=asc&_=1659303484372"
+    IBGE = f"https://sage.saude.gov.br/paineis/regiaoSaude/{XHR_header}"
     response = requests.get(IBGE)
     mapa_codigos = response.json()
 

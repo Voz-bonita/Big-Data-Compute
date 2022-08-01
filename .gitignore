@@ -7,6 +7,7 @@ Lista_1/Lista_1.Rmd
 Lista_1/logo-UnB.eps
 Lista_1/logo-UnB-eps-converted-to.pdf
 Lista_1/venv/
+Lista_1/assets/
 
 Lista_1/dados/*csv
 !Lista_1/dados/AC-Parte_1.csv

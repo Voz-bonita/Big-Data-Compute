@@ -1,7 +1,8 @@
 # \ devtools::install_github("ipeaGIT/geobr", subdir = "r-package")
 pacman::p_load(
     "data.table", "glue", "geobr", "dplyr",
-    "vroom", "Rfast", "rjson", "dtplyr"
+    "vroom", "Rfast", "rjson", "dtplyr",
+    "microbenchmark"
 )
 source("./Lista_1/funcoes_aux.r")
 
@@ -90,3 +91,68 @@ format_tab(
     bot5_vax_dtp,
     "5 regiões de saúde com menos vacinados por faixa de vacinação."
 )
+
+## Item d)
+
+DT_vannila <- function(dt) {
+    qnt_vax <- dt[, .N,
+        by = .(code_health_region, name_health_region)
+    ][, "faixa_de_vacinacao" := alto_baixo(N - median(N))]
+
+    bot5_vax <- qnt_vax[, .(
+        vacinados = head(sort(N), 5),
+        name_health_region = name_health_region[match(head(sort(N), 5), N)]
+    ), by = .(faixa_de_vacinacao)]
+}
+
+DT_dtplyr <- function(dt) {
+    qnt_vax_dtp <- dt %>%
+        group_by(
+            code_health_region,
+            name_health_region
+        ) %>%
+        tally() %>%
+        ungroup() %>%
+        mutate(faixa_de_vacinacao = alto_baixo(n - median(n))) %>%
+        as.data.table()
+
+    bot5_vax_dtp <- qnt_vax_dtp %>%
+        group_by(faixa_de_vacinacao) %>%
+        slice_min(order_by = n, n = 5) %>%
+        as.data.table()
+}
+
+DF_dplyr <- function(df) {
+    qnt_vax_dtp <- df %>%
+        group_by(
+            code_health_region,
+            name_health_region
+        ) %>%
+        tally() %>%
+        ungroup() %>%
+        mutate(faixa_de_vacinacao = alto_baixo(n - median(n))) %>%
+        as.data.table()
+
+    bot5_vax_dtp <- qnt_vax_dtp %>%
+        group_by(faixa_de_vacinacao) %>%
+        slice_min(order_by = n, n = 5) %>%
+        as.data.table()
+}
+
+joined_dplyr <- as_tibble(joined)
+
+microbenchmark(
+    "data.table" = DT_vannila(joined),
+    "dtplyr" = DT_dtplyr(joined_dtp),
+    "dplyr" = DF_dplyr(joined_dplyr),
+    times = 3L, unit = "ms"
+) %>%
+    summary() %>%
+    select(-`lq`, -uq, -median, -neval) %>%
+    rename_all(~ c("Pacote", "Mínimo", "Média", "Máximo")) %>%
+    format_tab(
+        caption = "Benchmark do tempo de execução das funções equivalentes no
+        data.table, dtplyr e dplyr, respectivamente para lidar com o banco de
+        vacinados e regiões de saúde.",
+        digits = 0
+    )

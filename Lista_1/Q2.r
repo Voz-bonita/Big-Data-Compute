@@ -68,7 +68,7 @@ bot5_vax <- qnt_vax[, .(
 ), by = .(faixa_de_vacinacao)]
 format_tab(
     bot5_vax,
-    "5 regiões de saúde com menos vacinados por faixa de vacinação."
+    "Cinco regiões de saúde com menos vacinados por faixa de vacinação."
 )
 
 ## Item c)
@@ -89,7 +89,7 @@ bot5_vax_dtp <- qnt_vax_dtp %>%
 
 format_tab(
     bot5_vax_dtp,
-    "5 regiões de saúde com menos vacinados por faixa de vacinação."
+    "Cinco regiões de saúde com menos vacinados por faixa de vacinação."
 )
 
 ## Item d)

@@ -15,16 +15,14 @@ nrow(primeiro) #> 499890 linhas
 
 head(primeiro[3:6L]) %>%
     format_tab(
-        caption = "\\label{tab:1b}5 primeiras observações da
+        caption = "\\label{tab:1b}Cinco primeiras observações da
         primeira parte dos dados de vacinação do estado do Acre."
     )
-
-spec(primeiro)
 
 ## Item c)
 arquivos <- glue("{dados_path}/{list.files(dados_path)}")
 
-length(arquivos)
+length(arquivos) #> 12 arquivos
 bytes <- file.size(arquivos) %>% sum()
 bytes / 1024^2 #> 7588,352 Megabytes
 bytes / 1024^3 #> 7,4105 Gigabytes
@@ -53,7 +51,7 @@ nrow(janssen) #> 13222 linhas
 
 head(janssen[3:6L]) %>%
     format_tab(
-        caption = "\\label{tab:1d1}5 primeiras observações da primeira
+        caption = "\\label{tab:1d1}Cinco primeiras observações da primeira
         parte dos dados de vacinação do estado do Acre,
         cuja vacina aplicada foi a Janssen."
     )
@@ -71,7 +69,7 @@ microbenchmark(
     select(-`lq`, -uq, -median, -neval) %>%
     rename_all(~ c("Pacote", "Mínimo", "Média", "Máximo")) %>%
     format_tab(
-        caption = "\\label{tab:1d1}Benchmark do tempo de execução das funções
+        caption = "\\label{tab:1d2}Benchmark do tempo de execução das funções
         object\\_size e object.size sobre o banco AC-Parte\\_1.",
         digits = 4
     )

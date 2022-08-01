@@ -1,7 +1,7 @@
 # \ devtools::install_github("ipeaGIT/geobr", subdir = "r-package")
 pacman::p_load(
     "data.table", "glue", "geobr", "dplyr",
-    "vroom", "Rfast", "rjson"
+    "vroom", "Rfast", "rjson", "dtplyr"
 )
 source("./Lista_1/funcoes_aux.r")
 
@@ -66,6 +66,27 @@ bot5_vax <- qnt_vax[, .(
     name_health_region = name_health_region[match(head(sort(N), 5), N)]
 ), by = .(faixa_de_vacinacao)]
 format_tab(
-    qnt_vax[1:10L, ],
+    bot5_vax,
+    "5 regiões de saúde com menos vacinados por faixa de vacinação."
+)
+
+## Item c)
+joined_dtp <- lazy_dt(joined)
+qnt_vax_dtp <- joined_dtp %>%
+    group_by(
+        code_health_region,
+        name_health_region
+    ) %>%
+    tally() %>%
+    as.data.table()
+
+bot5_vax_dtp <- qnt_vax_dtp %>%
+    mutate(faixa_de_vacinacao = alto_baixo(n - median(n))) %>%
+    group_by(faixa_de_vacinacao) %>%
+    slice_min(order_by = n, n = 5) %>%
+    as.data.table()
+
+format_tab(
+    bot5_vax_dtp,
     "5 regiões de saúde com menos vacinados por faixa de vacinação."
 )

@@ -49,7 +49,7 @@ joined <- regioes_saude[seg_dose,
     on = "code_health_region"
 ]
 format_tab(
-    joined[1:6L, 1:5L],
+    joined[1:6L, 1:4L],
     "Junção dos dados de vacinação e regiões de saúde"
 )
 

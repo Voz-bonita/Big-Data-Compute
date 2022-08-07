@@ -14,7 +14,7 @@ todos <- vroom(
     pipe(glue("grep -i JANSSEN {dados_path}/*.csv")),
     delim = ";",
     num_threads = 4,
-    show_col_types = FALSE,
+    col_types = cols(.default = "c"),
     col_names = names(primeiro)
 )
 
@@ -70,3 +70,32 @@ conn_codigos <- mongo(
     url = "mongodb://localhost"
 )
 conn_codigos$insert(codigos)
+
+joined <- conn_vax$aggregate('[
+    {
+        "$lookup":
+        {
+            "from": "codigos",
+            "localField": "estabelecimento_municipio_codigo",
+            "foreignField": "est_mun_codigo",
+            "as": "regDocs"
+        }
+    },
+    {
+        "$project":{
+        "query": {
+            "vacina_descricao_dose": "2\u00aa Dose"
+        },
+        "fields": {
+            "vacina_descricao_dose": 1,
+            "estabelecimento_uf": 1,
+            "name_health_region": "$regDocs.name_health_region"
+        }
+        }
+    },
+    {
+        "$project": {
+            "_id": 0
+        }
+    }
+]')

@@ -1,7 +1,7 @@
 if (!require(pacman)) install.packages("pacman")
 pacman::p_load(
-    "vroom", "glue", "DBI", "RSQLITE",
-    "geobr", "rjson", "dplyr"
+    "vroom", "glue", "DBI", "RSQLite",
+    "geobr", "rjson", "dplyr", "mongolite"
 )
 
 
@@ -26,13 +26,14 @@ dbWriteTable(janssen, "janssen_all", todos)
 ## Item b)
 reg_saude <- read_health_region()
 ibge_geobr <- fromJSON(file = "./Lista_1/mapa_codigos.json") %>% unlist()
-data.frame(
+codigos <- data.frame(
     "est_mun_codigo" = names(ibge_geobr),
     "code_health_region" = ibge_geobr
 ) %>%
     merge(reg_saude, by = "code_health_region") %>%
-    select(est_mun_codigo, name_health_region) %>%
-    dbWriteTable(janssen, "codigos", .)
+    select(est_mun_codigo, name_health_region)
+
+dbWriteTable(janssen, "codigos", codigos)
 
 
 join_query <- "SELECT janssen_all.estabelecimento_uf,
@@ -53,3 +54,19 @@ qnt_vax_query <- glue("SELECT name_health_region, COUNT(*) AS N
 ans <- dbGetQuery(janssen, qnt_vax_query)
 
 dbDisconnect(janssen)
+
+
+## Item c)
+conn_vax <- mongo(
+    collection = "vax",
+    db = "Lista2_db",
+    url = "mongodb://localhost"
+)
+conn_vax$insert(todos)
+
+conn_codigos <- mongo(
+    collection = "codigos",
+    db = "Lista2_db",
+    url = "mongodb://localhost"
+)
+conn_codigos$insert(codigos)

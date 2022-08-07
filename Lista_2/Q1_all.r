@@ -83,19 +83,20 @@ joined <- conn_vax$aggregate('[
     },
     {
         "$project":{
-        "query": {
-            "vacina_descricao_dose": "2\u00aa Dose"
-        },
-        "fields": {
             "vacina_descricao_dose": 1,
             "estabelecimento_uf": 1,
             "name_health_region": "$regDocs.name_health_region"
         }
+    },
+    { "$match": {
+        "$or": [
+            {"vacina_descricao_dose": "2\u00aa Dose"},
+            {"vacina_descricao_dose": "2\u00aa Dose Revacina\u00e7\u00e3o"}
+            ]
         }
     },
-    {
-        "$project": {
-            "_id": 0
-        }
+    { "$group": {
+        "_id": "$name_health_region",
+        "count": {"$sum": 1}}
     }
 ]')

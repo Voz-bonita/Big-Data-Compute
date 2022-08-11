@@ -7,19 +7,22 @@ pacman::p_load(
 
 # Questão 1
 ## Item a)
-dados_path <- "./Lista_1/dados"
-arquivos <- glue("{dados_path}/{list.files(dados_path)}")
-primeiro <- vroom(arquivos[1], n_max = 0, show_col_types = FALSE)
-todos <- vroom(
-    pipe(glue("grep -i JANSSEN {dados_path}/*.csv")),
-    delim = ";",
-    num_threads = 4,
-    col_types = cols(.default = "c"),
-    col_names = names(primeiro)
+dados_path <- ".\\Lista_1\\dados"
+arquivos <- glue("{dados_path}\\{list.files(dados_path)}")
+vax_all <- vroom(
+    pipe(glue("type {dados_path}\\*.csv")),
+    col_select = c(
+        "estabelecimento_uf",
+        "vacina_descricao_dose",
+        "estabelecimento_municipio_codigo"
+    ),
+    show_col_types = FALSE,
+    col_types = list("estabelecimento_municipio_codigo" = col_character()),
+    num_threads = 7
 )
 
-janssen <- dbConnect(RSQLite::SQLite(), "./Lista_2/Janssen_db.sqlite")
-dbWriteTable(janssen, "janssen_all", todos)
+sql_conn <- dbConnect(RSQLite::SQLite(), "./Lista_2/lista2.sqlite")
+dbWriteTable(sql_conn, "vax", vax_all)
 
 
 # Questão 2
@@ -33,7 +36,7 @@ codigos <- data.frame(
     merge(reg_saude, by = "code_health_region") %>%
     select(est_mun_codigo, name_health_region)
 
-dbWriteTable(janssen, "codigos", codigos)
+dbWriteTable(sql_conn, "codigos", codigos)
 
 
 join_query <- "SELECT janssen_all.estabelecimento_uf,
@@ -51,9 +54,9 @@ qnt_vax_query <- glue("SELECT name_health_region, COUNT(*) AS N
                        FROM ({seg_dose_query})
                        GROUP BY name_health_region")
 
-ans <- dbGetQuery(janssen, qnt_vax_query)
+ans <- dbGetQuery(sql_conn, qnt_vax_query)
 
-dbDisconnect(janssen)
+dbDisconnect(sql_conn)
 
 
 ## Item c)
@@ -62,7 +65,7 @@ conn_vax <- mongo(
     db = "Lista2_db",
     url = "mongodb://localhost"
 )
-conn_vax$insert(todos)
+conn_vax$insert(vax_all)
 
 conn_codigos <- mongo(
     collection = "codigos",

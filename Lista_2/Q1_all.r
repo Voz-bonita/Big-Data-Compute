@@ -39,22 +39,24 @@ codigos <- data.frame(
 dbWriteTable(sql_conn, "codigos", codigos)
 
 
-join_query <- "SELECT janssen_all.estabelecimento_uf,
-                    janssen_all.vacina_descricao_dose,
-                    codigos.name_health_region
-                FROM janssen_all
-                LEFT JOIN codigos
-                ON janssen_all.estabelecimento_municipio_codigo =
-                    codigos.est_mun_codigo"
+seg_dose_query <- "SELECT * FROM vax
+                   WHERE (vacina_descricao_dose='2ª Dose'
+                   OR vacina_descricao_dose='2ª Dose Revacinação')"
 
-seg_dose_query <- glue("SELECT * FROM ({join_query}) AS SUBQUERY
-                        WHERE (vacina_descricao_dose='2ª Dose')")
+fast_join <- glue("SELECT
+                    (SELECT name_health_region
+                        FROM codigos
+                        WHERE (codigos.est_mun_codigo =
+                            seg_dose.estabelecimento_municipio_codigo)
+                            ) AS regiao_saude
+                   FROM ({seg_dose_query}) AS seg_dose")
 
-qnt_vax_query <- glue("SELECT name_health_region, COUNT(*) AS N
-                       FROM ({seg_dose_query})
-                       GROUP BY name_health_region")
+qnt_vax_query <- glue("SELECT regiao_saude, COUNT(*) AS N
+                       FROM ({fast_join})
+                       GROUP BY regiao_saude")
 
 ans <- dbGetQuery(sql_conn, qnt_vax_query)
+dbWriteTable(sql_conn, "qnt_vax", ans)
 
 dbDisconnect(sql_conn)
 

@@ -125,3 +125,37 @@ qnt_vax <- conn_vax$aggregate('[
 
 conn_qnt_vax <- mongo_local("qnt_vax")
 conn_qnt_vax$insert(qnt_vax)
+
+mediana <- mediana(conn_qnt_vax$find()$N)
+conn_qnt_vax$update(
+    query = "{}",
+    update = glue('[{{
+        "$set": {{
+            "Faixa": {{
+                "$switch": {{
+                    "branches": [
+                        {{ "case":
+                            {{"$gte": ["$N", {mediana}]}},
+                            "then": "Alto" }},
+                        {{ "case":
+                            {{"$lt": ["$N", {mediana}]}},
+                            "then": "Baixo" }}
+                    ]
+                }}
+            }}
+        }}
+    }}]'),
+    multiple = TRUE,
+    upsert = TRUE
+)
+
+n <- 5
+bot5 <- bind_rows(
+    conn_qnt_vax$find(
+        limit = n, sort = '{"N": 1}'
+    ),
+    conn_qnt_vax$find(
+        skip = conn_qnt_vax$count() - n,
+        limit = n, sort = '{"N": 1}'
+    )
+)

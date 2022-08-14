@@ -55,12 +55,12 @@ qnt_vax_query <- glue("SELECT regiao_saude, COUNT(*) AS N
                        FROM ({fast_join})
                        GROUP BY regiao_saude")
 
-faixa_query <- "SELECT regiao_saude, N,
-                    CASE WHEN N > (SELECT MEDIAN(N) FROM qnt_vax)
-                        THEN 'Alto'
-                        ELSE 'Baixo'
-                        END AS Faixa
-                FROM qnt_vax"
+faixa_query <- glue("SELECT regiao_saude, N,
+                        CASE WHEN N > (SELECT MEDIAN(N) FROM ({qnt_vax_query}))
+                            THEN 'Alto'
+                            ELSE 'Baixo'
+                            END AS Faixa
+                    FROM qnt_vax")
 
 bot5_query <- glue("WITH tabFaixa AS ({faixa_query})
                     SELECT *
@@ -70,8 +70,6 @@ bot5_query <- glue("WITH tabFaixa AS ({faixa_query})
                     FROM (SELECT * FROM tabFaixa ORDER BY N DESC LIMIT 5)
                     ORDER BY N")
 
-ans <- dbGetQuery(sql_conn, qnt_vax_query)
-dbWriteTable(sql_conn, "qnt_vax", ans)
 ans <- dbGetQuery(sql_conn, bot5_query)
 
 dbDisconnect(sql_conn)

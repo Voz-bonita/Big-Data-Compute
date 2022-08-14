@@ -76,21 +76,22 @@ dbDisconnect(sql_conn)
 
 
 ## Item c)
-conn_vax <- mongo(
-    collection = "vax",
-    db = "Lista2_db",
-    url = "mongodb://localhost"
-)
+mongo_local <- function(collection) {
+    conn <- mongo(
+        collection = collection,
+        db = "Lista2_db",
+        url = "mongodb://localhost"
+    )
+    return(conn)
+}
+
+conn_vax <- mongo_local("vax")
 conn_vax$insert(vax_all)
 
-conn_codigos <- mongo(
-    collection = "codigos",
-    db = "Lista2_db",
-    url = "mongodb://localhost"
-)
+conn_codigos <- mongo_local("codigos")
 conn_codigos$insert(codigos)
 
-joined <- conn_vax$aggregate('[
+qnt_vax <- conn_vax$aggregate('[
     {
         "$lookup":
         {
@@ -109,13 +110,18 @@ joined <- conn_vax$aggregate('[
     },
     { "$match": {
         "$or": [
-            {"vacina_descricao_dose": "2\u00aa Dose"},
-            {"vacina_descricao_dose": "2\u00aa Dose Revacina\u00e7\u00e3o"}
+            {"vacina_descricao_dose": "2Âª Dose"},
+            {"vacina_descricao_dose": "2Âª Dose RevacinaÃ§Ã£o"}
             ]
         }
     },
     { "$group": {
         "_id": "$name_health_region",
-        "count": {"$sum": 1}}
+        "N": {"$sum": 1}
+        }
     }
-]')
+]') %>%
+    rename("Nome" = `_id`)
+
+conn_qnt_vax <- mongo_local("qnt_vax")
+conn_qnt_vax$insert(qnt_vax)

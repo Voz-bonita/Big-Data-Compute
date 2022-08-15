@@ -5,7 +5,7 @@ pacman::p_load("vroom", "glue", "geobr", "rjson", "dplyr")
 dados_path <- ".\\Lista_1\\dados"
 arquivos <- glue("{dados_path}\\{list.files(dados_path)}")
 vax_all <- vroom(
-    pipe(glue("type {dados_path}\\*.csv")),
+    arquivos,
     col_select = c(
         "estabelecimento_uf",
         "vacina_descricao_dose",

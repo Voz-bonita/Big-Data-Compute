@@ -43,5 +43,6 @@ bot5_query <- glue("WITH tabFaixa AS ({faixa_query})
                     ORDER BY N")
 
 
-ans <- dbGetQuery(sql_conn, faixa_query)
+ans <- dbGetQuery(sql_conn, bot5_query)
+
 dbDisconnect(sql_conn)

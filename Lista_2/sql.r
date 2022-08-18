@@ -27,13 +27,12 @@ qnt_vax_query <- glue("SELECT regiao_saude, COUNT(*) AS N
                        FROM ({fast_join})
                        GROUP BY regiao_saude")
 
-faixa_query <- glue("WITH qntVax AS ({qnt_vax_query})
-                    SELECT regiao_saude, N,
-                        CASE WHEN N > (SELECT MEDIAN(N) FROM qntVax)
+faixa_query <- glue("SELECT regiao_saude, N,
+                        CASE WHEN N > (SELECT MEDIAN(N) FROM qnt_vax)
                             THEN 'Alto'
                             ELSE 'Baixo'
                             END AS Faixa
-                    FROM  qntVax")
+                    FROM qnt_vax")
 
 bot5_query <- glue("WITH tabFaixa AS ({faixa_query})
                     SELECT *
@@ -43,14 +42,19 @@ bot5_query <- glue("WITH tabFaixa AS ({faixa_query})
                     FROM (SELECT * FROM tabFaixa ORDER BY N DESC LIMIT 5)
                     ORDER BY N")
 
+solve_sql <- function() {
+    qnt_vax <- DBI::dbGetQuery(sql_conn, qnt_vax_query)
+    DBI::dbWriteTable(sql_conn, "qnt_vax", qnt_vax, overwrite = TRUE)
+    DBI::dbGetQuery(sql_conn, bot5_query)
+}
 
 microbenchmark(
-    "sql" = dbGetQuery(sql_conn, bot5_query),
-    times = 1L, unit = "s"
+    "SQLite" = solve_sql(),
+    times = 3L, unit = "s"
 ) %>%
     summary() %>%
     select(-`lq`, -uq, -median, -neval) %>%
     rename_all(~ c("Solução", "Mínimo", "Média", "Máximo")) %>%
-    format_tab(caption = "Teste", digits = 1L)
+    format_tab(caption = "", digits = 1L)
 
 dbDisconnect(sql_conn)

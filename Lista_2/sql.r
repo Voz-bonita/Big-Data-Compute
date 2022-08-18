@@ -1,6 +1,7 @@
 if (!require(pacman)) install.packages("pacman")
-pacman::p_load("DBI", "RSQLite", "glue")
+pacman::p_load("DBI", "RSQLite", "glue", "microbenchmark")
 source("./Lista_2/banco.r")
+source("./Lista_1/funcoes_aux.r")
 
 
 # Questão 2
@@ -32,7 +33,7 @@ faixa_query <- glue("WITH qntVax AS ({qnt_vax_query})
                             THEN 'Alto'
                             ELSE 'Baixo'
                             END AS Faixa
-                    FROM qntVax")
+                    FROM  qntVax")
 
 bot5_query <- glue("WITH tabFaixa AS ({faixa_query})
                     SELECT *
@@ -43,6 +44,13 @@ bot5_query <- glue("WITH tabFaixa AS ({faixa_query})
                     ORDER BY N")
 
 
-ans <- dbGetQuery(sql_conn, bot5_query)
+microbenchmark(
+    "sql" = dbGetQuery(sql_conn, bot5_query),
+    times = 1L, unit = "s"
+) %>%
+    summary() %>%
+    select(-`lq`, -uq, -median, -neval) %>%
+    rename_all(~ c("Solução", "Mínimo", "Média", "Máximo")) %>%
+    format_tab(caption = "Teste", digits = 1L)
 
 dbDisconnect(sql_conn)

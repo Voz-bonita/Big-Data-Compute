@@ -47,11 +47,11 @@ src = "https://datasus.saude.gov.br/wp-content/download.php"
 db = "ftp://ftp.datasus.gov.br/dissemin/publicos/SINASC/1996_/Dados/DNRES"
 payload = {}
 
-k = 0
+
 for estado in estados:
     print(estado)
     for ano in anos:
-        print(anos)
+        print(ano)
         file = f"DN{estado}{ano}.dbc"
         payload = {
             "dados[0][arquivo]": file,

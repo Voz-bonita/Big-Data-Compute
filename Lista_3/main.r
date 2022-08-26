@@ -1,14 +1,14 @@
 if (!require(pacman)) install.packages("pacman")
 pacman::p_load(
     "arrow", "read.dbc", "glue",
-    "purrr", "dplyr", "stringr",
-    "microbenchmark", "sparklyr",
-    "furrr"
+    "furrr", "dplyr", "stringr",
 )
 
 
 ## Item b)
 conversor_dbc <- function(files, origin_path, oformat) {
+    "Recebe os arquivos dbc, seu caminho de origem e o formato de saída
+    e abre um plano de multisessões do future para fazer a conversão"
     future::plan(future::multisession, workers = 7)
     if (oformat == "parquet") convert <- write_parquet
     if (oformat == "csv") convert <- write_csv_arrow
@@ -44,12 +44,12 @@ conversor_dbc(
 
 parquets <- list.files("./Lista_3/parquets/", full.names = TRUE)
 csvs <- list.files("./Lista_3/csvs/", full.names = TRUE)
-file.size(parquets) %>% sum() / 1024^2 %>% round(2)
-file.size(csvs) %>% sum() / 1024^2 %>% round(2)
-
+file.size(parquets) %>% sum() / 1024^2
+file.size(csvs) %>% sum() / 1024^2
 
 
 ## Item c)
+pacman::p_load("microbenchmark", "sparklyr")
 source("./Lista_1/funcoes_aux.r")
 
 sc <- spark_connect(master = "local", version = "2.4.3")

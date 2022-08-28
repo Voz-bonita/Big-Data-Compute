@@ -73,3 +73,33 @@ conversor_dbc(
     origin_path = path,
     oformat = "parquet"
 )
+
+
+# Questão 2
+
+sinasc <- spark_read_parquet(
+    sc,
+    path = "Lista_3/teste/*",
+    infer_schema = FALSE
+) %>%
+    select(-c(
+        contador, LOCNASC, CODMUNNASC,
+        CODMUNRES, DTNASC, APGAR1, APGAR5,
+        RACACOR, CODANOMAL
+    ))
+
+sinasc %>%
+    select(IDADEMAE, QTDFILVIVO, QTDFILMORT) %>%
+    sdf_describe() %>%
+    mutate_at(c("IDADEMAE", "QTDFILVIVO", "QTDFILMORT"), as.numeric) %>%
+    rename_all(
+        ~ c(
+            "Medida", "Idade da Mãe",
+            "Nº de Filhos vivos", "Nº de Filhos mortos"
+        )
+    ) %>%
+    format_tab(
+        cap = "Medidas descritivas das variáveis quantitivas do SINASC",
+        digits = 2,
+        "latex"
+    )

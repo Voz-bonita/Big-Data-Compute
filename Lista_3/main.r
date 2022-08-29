@@ -103,3 +103,27 @@ sinasc %>%
         digits = 2,
         "latex"
     )
+
+sinasc %>%
+    mutate_if(is.character, as.numeric) %>%
+    ft_index_to_string(
+        input_col = "SEXO",
+        output_col = "SEXO_lab",
+        labels = c("0" = "Ignorado", "1" = "Masculino", "2" = "Feminino")
+    ) %>%
+    ft_index_to_string(
+        input_col = "ESTCIVMAE",
+        output_col = "ESTCIVMAE_lab",
+        labels = c(
+            "1" = "Solteira", "2" = "Casada", "3" = "Viúva",
+            "4" = "Separado judicialmente/Divorciado", "9" = "Ignorado "
+        )
+    ) %>%
+    ft_index_to_string(
+        input_col = "ESTCIVMAE",
+        output_col = "ESTCIVMAE_lab",
+        labels = c(
+            "1" = "Solteira", "2" = "Casada", "3" = "Viúva",
+            "4" = "Separado judicialmente/Divorciado", "9" = "Ignorado "
+        )
+    )

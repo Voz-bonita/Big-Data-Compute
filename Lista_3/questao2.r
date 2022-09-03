@@ -63,8 +63,7 @@ sinasc %>%
     ft_standard_scaler(
         input_col = "qnt_features",
         output_col = "standard_qnt"
-    ) %>%
-    ft_one_hot_encoder(input_cols = "DTNASC", output_cols = as.character(1:7L))
+    )
 
 sinasc %>%
     filter(!is.na(DTNASC)) %>%

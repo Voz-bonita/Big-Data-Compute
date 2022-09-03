@@ -70,5 +70,10 @@ sinasc %>%
     filter(!is.na(DTNASC)) %>%
     ft_one_hot_encoder(
         input_cols = "DTNASC",
-        output_cols = "dummyDTNASC"
+        output_cols = "DTNASC_dummy"
+    ) %>%
+    ft_binarizer(
+        input_col = "CONSULTAS",
+        output_col = "CONSULTAS_bin",
+        threshold = 3
     )

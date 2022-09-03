@@ -1,5 +1,5 @@
 if (!require(pacman)) install.packages("pacman")
-pacman::p_load("arrow", "dplyr", "stringr", "sparklyr", "lubridate")
+pacman::p_load("arrow", "dplyr", "stringr", "sparklyr", "lubridate", "ggplot2")
 source("./Lista_1/funcoes_aux.r")
 
 sc <- spark_connect(master = "local", version = "2.4.3")
@@ -76,3 +76,26 @@ sinasc %>%
         output_col = "CONSULTAS_bin",
         threshold = 3
     )
+
+
+particoes <- sinasc %>%
+    mutate(PARTO = if_else(PARTO != 2, 1, 0, 0)) %>%
+    sdf_random_split(training = 0.8, test = 0.2, seed = 2022)
+
+treino <- particoes$training
+teste <- particoes$test
+
+formula <- ("PARTO ~ IDADEMAE")
+lr_model <- ml_logistic_regression(treino, formula)
+
+# Prevendo usando o spark - Predict()
+validation_summary <- ml_evaluate(lr_model, teste)
+
+roc <- validation_summary$roc() %>%
+    collect()
+
+validation_summary$area_under_roc()
+
+ggplot(roc, aes(x = FPR, y = TPR)) +
+    geom_line() +
+    geom_abline(lty = "dashed")

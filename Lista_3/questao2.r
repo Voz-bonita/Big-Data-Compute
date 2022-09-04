@@ -8,7 +8,7 @@ source("./Lista_1/funcoes_aux.r")
 sc <- spark_connect(master = "local", version = "2.4.3")
 
 # Questão 2
-
+#--------- Carrega e trata a db ---------#
 sinasc <- spark_read_parquet(
     sc,
     path = "Lista_3/teste/*"
@@ -33,6 +33,8 @@ sinasc <- spark_read_parquet(
     mutate(QTDFILVIVO = as.numeric(QTDFILVIVO)) %>%
     mutate(SEXO = as.numeric(SEXO))
 
+
+#--------- Exploratória ---------#
 sinasc %>%
     select(IDADEMAE, QTDFILVIVO, QTDFILMORT, PESO) %>%
     sdf_describe() %>%
@@ -60,6 +62,7 @@ sinasc <- sinasc %>%
     select(-colnames(faltante[which(faltante > 0.15)]))
 
 
+#--------- Imputação e correções ---------#
 qnt_vars <- c("IDADEMAE", "QTDFILVIVO", "PESO")
 
 sinasc <- sinasc %>%
@@ -68,6 +71,13 @@ sinasc <- sinasc %>%
         output_cols = qnt_vars,
         strategy = "median"
     ) %>%
+    filter(!is.na(DTNASC)) %>%
+    mutate(CONSULTAS = if_else(is.na(CONSULTAS), 9, CONSULTAS)) %>%
+    mutate(GRAVIDEZ = if_else(is.na(GRAVIDEZ), 9, GRAVIDEZ)) %>%
+    mutate(GESTACAO = if_else(is.na(GESTACAO), 9, GESTACAO)) %>%
+    mutate(ESCMAE = if_else(is.na(ESCMAE), 9, ESCMAE))
+
+sinasc <- sinasc %>%
     ft_vector_assembler(
         input_cols = qnt_vars,
         output_col = "qnt_features"
@@ -75,13 +85,7 @@ sinasc <- sinasc %>%
     ft_standard_scaler(
         input_col = "qnt_features",
         output_col = "standard_qnt"
-    ) %>%
-    filter(!is.na(DTNASC)) %>%
-    mutate(CONSULTAS = if_else(is.na(CONSULTAS), 9, CONSULTAS)) %>%
-    mutate(GRAVIDEZ = if_else(is.na(GRAVIDEZ), 9, GRAVIDEZ)) %>%
-    mutate(GESTACAO = if_else(is.na(GESTACAO), 9, GESTACAO)) %>%
-    mutate(ESCMAE = if_else(is.na(ESCMAE), 9, ESCMAE))
-
+    )
 
 sinasc <- sinasc %>%
     ft_one_hot_encoder(
@@ -96,6 +100,7 @@ sinasc <- sinasc %>%
 
 
 #--------- Modelo de Regressão ---------#
+#--- Preparativos ---#
 particoes <- sinasc %>%
     mutate(PARTO = if_else(PARTO != 2, 1, 0, 0)) %>%
     sdf_random_split(training = 0.8, test = 0.2, seed = 2022)
@@ -103,14 +108,19 @@ particoes <- sinasc %>%
 treino <- particoes$training
 teste <- particoes$test
 
+#--- Treino ---#
 label_out <- "PARTO"
 features <- paste(
-    colnames(select(sinasc, -c(qnt_vars, "qnt_features", "DTNASC"))),
+    colnames(select(
+        sinasc,
+        -c(qnt_vars, "qnt_features", "DTNASC", "CONSULTAS", "PARTO")
+    )),
     collapse = " + "
 )
 formula <- (glue("{label_out} ~ {features}"))
 lr_model <- ml_logistic_regression(treino, formula)
 
+#--- Validação ---#
 validation_summary <- ml_evaluate(lr_model, teste)
 
 roc <- validation_summary$roc() %>%

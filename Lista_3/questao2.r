@@ -16,7 +16,7 @@ sinasc <- spark_read_parquet(
     select(-c(
         contador, LOCNASC, CODMUNNASC,
         CODMUNRES, APGAR1, APGAR5,
-        RACACOR, CODANOMAL,
+        RACACOR, CODANOMAL
     )) %>%
     mutate(DTNASC = from_unixtime(unix_timestamp(DTNASC, "ddMMyyyy"), "u")) %>%
     mutate(CODOCUPMAE = as.numeric(CODOCUPMAE)) %>%
@@ -34,13 +34,14 @@ sinasc <- spark_read_parquet(
     mutate(SEXO = as.numeric(SEXO))
 
 sinasc %>%
-    select(IDADEMAE, QTDFILVIVO, QTDFILMORT) %>%
+    select(IDADEMAE, QTDFILVIVO, QTDFILMORT, PESO) %>%
     sdf_describe() %>%
-    mutate_at(c("IDADEMAE", "QTDFILVIVO", "QTDFILMORT"), as.numeric) %>%
+    mutate_at(c("IDADEMAE", "QTDFILVIVO", "QTDFILMORT", "PESO"), as.numeric) %>%
     rename_all(
         ~ c(
             "Medida", "Idade da Mãe",
-            "Nº de Filhos vivos", "Nº de Filhos mortos"
+            "Nº de Filhos vivos", "Nº de Filhos mortos",
+            "Peso"
         )
     ) %>%
     format_tab(
@@ -97,7 +98,6 @@ sinasc <- sinasc %>%
 #--------- Modelo de Regressão ---------#
 particoes <- sinasc %>%
     mutate(PARTO = if_else(PARTO != 2, 1, 0, 0)) %>%
-    filter(!is.na(CONSULTAS)) %>%
     sdf_random_split(training = 0.8, test = 0.2, seed = 2022)
 
 treino <- particoes$training
@@ -105,10 +105,10 @@ teste <- particoes$test
 
 label_out <- "PARTO"
 features <- paste(
-    colnames(select(sinasc, -c(qnt_vars, qnt_features))),
+    colnames(select(sinasc, -c(qnt_vars, "qnt_features", "DTNASC"))),
     collapse = " + "
 )
-formula <- (glue("{label_out} ~ features"))
+formula <- (glue("{label_out} ~ {features}"))
 lr_model <- ml_logistic_regression(treino, formula)
 
 validation_summary <- ml_evaluate(lr_model, teste)

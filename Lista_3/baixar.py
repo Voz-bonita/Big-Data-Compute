@@ -1,10 +1,14 @@
-from lxml import html
 import requests
 import zipfile, io
 import os
 
 
 def download(link, path):
+    """
+    Faz o download dos arquivos zip  já salvando
+    os resultados descompatados em uma pasta e
+    criando a mesma caso ainda não exista
+    """
     r = requests.get(link)
     z = zipfile.ZipFile(io.BytesIO(r.content))
     if not os.path.exists(path):

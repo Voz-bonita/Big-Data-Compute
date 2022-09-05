@@ -19,6 +19,7 @@ conversor_dbc <- function(files, origin_path, oformat) {
     future_walk(
         files,
         ~ read.dbc(glue("{origin_path}/{.x}")) %>%
+            select(all_of(cols_1996)) %>%
             convert(sink = glue(
                 "./Lista_3/{oformat}s/{
                     stringr::str_replace(.x, 'dbc', oformat)
@@ -29,6 +30,10 @@ conversor_dbc <- function(files, origin_path, oformat) {
 
 path <- "./Lista_3/datasus"
 files <- list.files(path)
+cols_1996 <- colnames(read.dbc(glue("{path}/{files[1]}")))
+cols_1996 <- cols_1996[!(cols_1996 %in% c("CODOCUPMAE", "contador"))]
+
+
 GO_ES_MS <- str_detect(files, "GO|MS|ES")
 
 conversor_dbc(
@@ -44,8 +49,8 @@ conversor_dbc(
 
 parquets <- list.files("./Lista_3/parquets/", full.names = TRUE)
 csvs <- list.files("./Lista_3/csvs/", full.names = TRUE)
-file.size(parquets) %>% sum() / 1024^2
-file.size(csvs) %>% sum() / 1024^2
+file.size(parquets) %>% sum() / 1024^2 #> 35.08 Mb
+file.size(csvs) %>% sum() / 1024^2 #> 436.92 Mb
 
 
 ## Item c)

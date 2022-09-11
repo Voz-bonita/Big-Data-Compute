@@ -18,7 +18,7 @@ lambda_ij <- map(gf, ~ (.x + gs) / 2)
 #--- #
 
 # Item a)
-#--- Probabilidade exata ~~ 0.00434 ~~ 0.4%
+#--- Probabilidade exata ~~ 0.00434 ~~ 0.43%
 dpois(5, lambda_ij[["Brazil"]]["Serbia"]) *
     dpois(0, lambda_ij[["Serbia"]]["Brazil"])
 
@@ -26,5 +26,5 @@ dpois(5, lambda_ij[["Brazil"]]["Serbia"]) *
 n <- 10^6
 br <- rpois(n, lambda_ij[["Brazil"]]["Serbia"])
 serv <- rpois(n, lambda_ij[["Serbia"]]["Brazil"])
-sum(br == 5 && serv == 0) / n
-#--- Probabilidade estimada ~~ 0%
+sum(br == 5 & serv == 0) / n
+#--- Probabilidade estimada ~~ 0.00418 ~~ 0.42%

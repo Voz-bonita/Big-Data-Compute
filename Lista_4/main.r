@@ -1,5 +1,6 @@
 if (!require(pacman)) install.packages("pacman")
-pacman::p_load("readxl", "dplyr", "stringr", "purrr")
+pacman::p_load("readxl", "dplyr", "stringr", "purrr", "glue")
+source("./Lista_4/custom_functions.r")
 set.seed(2022)
 
 
@@ -28,3 +29,35 @@ br <- rpois(n, lambda_ij[["Brazil"]]["Serbia"])
 serv <- rpois(n, lambda_ij[["Serbia"]]["Brazil"])
 sum(br == 5 & serv == 0) / n
 #--- Probabilidade estimada ~~ 0.00418 ~~ 0.42%
+
+##### ----------------------------------
+paises <- pull(serie, Pais)
+codificado <- n_prime(length(paises))
+names(codificado) <- paises
+
+probs <- expand_probs(paises, codificado, lambda_ij)
+##### ----------------------------------
+
+# Item b)
+grupo_g <- c("Brazil", "Cameroon", "Serbia", "Switzerland")
+bb <- combn(grupo_g, 2)
+
+
+aa <- simul_grupo(grupo_g, codificado, probs)
+
+
+bra_next <- aa %>%
+    rowwise() %>%
+    mutate(Aprovacao = Brazil %in%
+        tail(sort(c(Brazil, Cameroon, Serbia, Switzerland)), 2)) %>%
+    filter(Aprovacao)
+
+prob_by_win <- function(jogo) {
+    bra_next %>%
+        filter_at(glue("Jogo{jogo}"), any_vars(. == 1)) %>%
+        pull(Prob) %>%
+        sum()
+}
+prob_by_win(1) #> ~= 42.02%
+prob_by_win(2) #> ~= 42.09%
+prob_by_win(3) #> ~= 48.11%

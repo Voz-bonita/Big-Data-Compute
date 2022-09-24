@@ -26,30 +26,22 @@ n_prime <- function(n) {
     return(primes)
 }
 
-prob_jogo <- function(time_a, time_b, params, vitoria = "V", n_simul = 10^6) {
+prob_jogo <- function(time_a, time_b, params, n_simul = 10^6) {
     "
     Função responsável por, dados dois times e o resultado
-    da partida (vitória do time a, empate ou vitória do time b)
+    da partida (vitória do time a, empate ou derrota do time a)
     retorna a probabilidade desse resultado ocorrer
     "
     gols_a <- rpois(n_simul, params[[time_a]][time_b])
     gols_b <- rpois(n_simul, params[[time_b]][time_a])
 
-    op <- ""
-    if (str_detect(vitoria, "V")) {
-        op <- str_c(op, ">")
-    } else if (str_detect(vitoria, "D")) {
-        op <- str_c(op, "<")
-    }
-    if (str_detect(vitoria, "E")) {
-        op <- str_c(op, "=")
-        if (length(vitoria) == 1) {
-            op <- str_c(op, "=")
-        }
-    }
+    probs <- c(
+        "V" = sum(gols_a > gols_b),
+        "E" = sum(gols_a == gols_b),
+        "D" = sum(gols_a < gols_b)
+    ) / n_simul
 
-    prob <- eval(parse(text = eval(glue("gols_a {op} gols_b"))))
-    return(sum(prob) / n_simul)
+    return(probs)
 }
 
 expand_probs <- function(paises, codificado, params) {
@@ -61,12 +53,10 @@ expand_probs <- function(paises, codificado, params) {
 
         identificador <- codificado[time_b] * log(codificado[time_a])
 
-        v <- prob_jogo(time_a, time_b, params = params, vitoria = "V")
-        e <- prob_jogo(time_a, time_b, params = params, vitoria = "E")
-        d <- prob_jogo(time_a, time_b, params = params, vitoria = "D")
-        probs[as.character(identificador)] <- v
-        probs[as.character(2 * identificador)] <- e
-        probs[as.character(3 * identificador)] <- d
+        probs <- prob_jogo(time_a, time_b, params = params)
+        probs[as.character(identificador)] <- probs["V"]
+        probs[as.character(2 * identificador)] <- probs["E"]
+        probs[as.character(3 * identificador)] <- probs["D"]
     }
     return(probs)
 }

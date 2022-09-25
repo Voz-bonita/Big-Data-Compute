@@ -95,3 +95,16 @@ simul_grupo <- function(grupo, codificado, pre_probs) {
 
     return(resultados)
 }
+
+prob_by_win <- function(jogo) {
+    "
+    Recebe como entrada um dos jogos do grupo
+    podendo ser de 1 a 6, e retorna qual a probabilidiade
+    do Brasil ser aprovado nos cenários em que para o jogo
+    informado ocorreu vitória do time A
+    "
+    bra_next %>%
+        filter_at(glue("Jogo{jogo}"), any_vars(. == 1)) %>%
+        pull(Prob) %>%
+        sum()
+}

@@ -30,34 +30,25 @@ serv <- rpois(n, lambda_ij[["Serbia"]]["Brazil"])
 sum(br == 5 & serv == 0) / n
 #--- Probabilidade estimada ~~ 0.00418 ~~ 0.42%
 
-##### ----------------------------------
+# ------- Probabilidade de qualquer jogo da Copa
 paises <- pull(serie, Pais)
 codificado <- n_prime(length(paises))
 names(codificado) <- paises
 
 probs <- expand_probs(paises, codificado, lambda_ij)
-##### ----------------------------------
+# -------
 
 # Item b)
 grupo_g <- c("Brazil", "Cameroon", "Serbia", "Switzerland")
-bb <- combn(grupo_g, 2)
+expand_grp_g <- simul_grupo(grupo_g, codificado, probs)
 
-
-aa <- simul_grupo(grupo_g, codificado, probs)
-
-
-bra_next <- aa %>%
+### Se a pontuação do Brasil estiver em pelo menos segundo, ele passa
+bra_next <- expand_grp_g %>%
     rowwise() %>%
     mutate(Aprovacao = Brazil %in%
         tail(sort(c(Brazil, Cameroon, Serbia, Switzerland)), 2)) %>%
     filter(Aprovacao)
 
-prob_by_win <- function(jogo) {
-    bra_next %>%
-        filter_at(glue("Jogo{jogo}"), any_vars(. == 1)) %>%
-        pull(Prob) %>%
-        sum()
-}
-prob_by_win(1) #> ~= 42.02%
+prob_by_win(1) #> ~= 42.06%
 prob_by_win(2) #> ~= 42.09%
 prob_by_win(3) #> ~= 48.11%

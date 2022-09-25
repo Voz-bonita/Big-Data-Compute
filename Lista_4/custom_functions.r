@@ -46,17 +46,18 @@ prob_jogo <- function(time_a, time_b, params, n_simul = 10^6) {
 
 expand_probs <- function(paises, codificado, params) {
     jogos_possiveis <- combn(paises, 2)
+    n_jogos <- ncol(jogos_possiveis)
     probs <- c()
-    for (i in 1:(ncol(jogos_possiveis))) {
+    for (i in 1:n_jogos) {
         time_a <- jogos_possiveis[1, i]
         time_b <- jogos_possiveis[2, i]
 
         identificador <- codificado[time_b] * log(codificado[time_a])
 
-        probs <- prob_jogo(time_a, time_b, params = params)
-        probs[as.character(identificador)] <- probs["V"]
-        probs[as.character(2 * identificador)] <- probs["E"]
-        probs[as.character(3 * identificador)] <- probs["D"]
+        probs_i <- prob_jogo(time_a, time_b, params = params)
+        probs[as.character(identificador)] <- probs_i["V"]
+        probs[as.character(2 * identificador)] <- probs_i["E"]
+        probs[as.character(3 * identificador)] <- probs_i["D"]
     }
     return(probs)
 }

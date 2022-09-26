@@ -9,8 +9,7 @@ serie <- read_xlsx(
     col_types = c("text", "numeric", "numeric", "numeric")
 ) %>%
     mutate(GF = Gols_feitos / Jogos) %>%
-    mutate(GS = Gols_sofridos / Jogos) %>%
-    mutate(Pais = str_sub(Pais, 2L, -1L))
+    mutate(GS = Gols_sofridos / Jogos)
 
 #--- Lista de parâmetros ---#
 gf <- pull(serie, GF, name = Pais)
